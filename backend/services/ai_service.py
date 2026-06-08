@@ -1,55 +1,42 @@
 import os
-import requests
-from dotenv import load_dotenv
+import urllib.request
+import json
 
-load_dotenv()
-
-API_KEY = os.getenv("OPENROUTER_API_KEY")
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 
 def get_ai_response(user_message):
 
-    url = "https://openrouter.ai/api/v1/chat/completions"
-
-    headers = {
-        "Authorization": f"Bearer {API_KEY}",
-        "Content-Type": "application/json"
-    }
-
-    data = {
-        "model": "openai/gpt-3.5-turbo",
-        "messages": [
-            {
-                "role": "user",
-                "content": user_message
-            }
-        ]
-    }
-
     try:
 
-        response = requests.post(
+        url = "https://openrouter.ai/api/v1/chat/completions"
+
+        headers = {
+            "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+            "Content-Type": "application/json"
+        }
+
+        data = {
+            "model": "openai/gpt-3.5-turbo",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": user_message
+                }
+            ]
+        }
+
+        req = urllib.request.Request(
             url,
+            data=json.dumps(data).encode("utf-8"),
             headers=headers,
-            json=data
+            method="POST"
         )
 
-        result = response.json()
+        with urllib.request.urlopen(req) as response:
 
-        # Debug print
-        print(result)
-
-        if "choices" in result:
+            result = json.loads(response.read().decode())
 
             return result["choices"][0]["message"]["content"]
 
-        elif "error" in result:
-
-            return f"API Error: {result['error']['message']}"
-
-        else:
-
-            return "Unexpected API response"
-
     except Exception as e:
-
         return f"Error: {str(e)}"
