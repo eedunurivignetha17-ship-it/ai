@@ -1,3 +1,7 @@
-Flask
-Flask-Cors
-Flask-SQLAlchemy
+```txt id="p9m3q7"
+flask
+flask-cors
+python-dotenv
+requests
+gunicorn
+```
